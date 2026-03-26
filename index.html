@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Dynamic Data Storytelling Engine profiles uploaded data, PDFs, Word documents, and images, explains quality problems, recommends what is missing, and asks before cleaning."
+    />
+    <title>Dynamic Data Storytelling Engine</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="ambient ambient-a"></div>
+      <div class="ambient ambient-b"></div>
+      <div class="ambient ambient-c"></div>
+
+      <header class="site-header">
+        <a class="brand" href="#top">
+          <span class="brand-mark">DE</span>
+          <span class="brand-text">Dynamic Data Storytelling Engine</span>
+        </a>
+
+        <nav class="site-nav" aria-label="Primary">
+          <a href="#workspace">Workspace</a>
+          <a href="#engine">Engine</a>
+          <a href="#trust">Trust</a>
+        </nav>
+      </header>
+
+      <main id="top">
+        <section class="hero panel" data-reveal>
+          <div class="hero-copy">
+            <p class="eyebrow">AI Data Quality Copilot</p>
+            <h1>Bring any structured data. Learn what is broken before you clean it.</h1>
+            <p class="hero-text">
+              This project no longer expects a fixed schema. Upload structured
+              data, PDFs, Word documents, or images, and the app will either
+              profile the data directly or extract text first before diagnosing
+              missing values, type issues, duplicates, suspicious rows, and weak
+              spots that reduce accuracy. Then it asks whether you want to
+              preview or apply safe cleaning.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button button-primary" href="#workspace">Open workspace</a>
+              <a class="button button-secondary" href="#engine">See technical edge</a>
+            </div>
+
+            <ul class="signal-strip" aria-label="Core capabilities">
+              <li>Schema-agnostic ingestion</li>
+              <li>PDF, Word, and image support</li>
+              <li>Missing-data diagnostics</li>
+              <li>Accuracy recommendations</li>
+            </ul>
+          </div>
+
+          <aside class="hero-monitor" aria-label="Live profiling monitor">
+            <div class="monitor-top">
+              <p class="monitor-tag">Live profile</p>
+              <p class="monitor-state" id="monitorState">Sample profile loaded</p>
+            </div>
+
+            <div class="monitor-terminal">
+              <p class="console-line console-line-soft" id="datasetTag">dataset://sample-ops.json</p>
+              <p class="console-line" id="heroPrompt">
+                Profiling schema, missing values, type consistency, and duplicate risk.
+              </p>
+              <p class="console-line console-line-accent" id="heroStatus">
+                Safe cleaning is available, but the app will ask before applying it.
+              </p>
+            </div>
+
+            <div class="monitor-grid">
+              <article>
+                <span class="mini-label">Rows</span>
+                <strong id="heroRows">0</strong>
+              </article>
+              <article>
+                <span class="mini-label">Columns</span>
+                <strong id="heroColumns">0</strong>
+              </article>
+              <article>
+                <span class="mini-label">Issues</span>
+                <strong id="heroIssues">0</strong>
+              </article>
+              <article>
+                <span class="mini-label">Health</span>
+                <strong id="heroHealth">0%</strong>
+              </article>
+            </div>
+          </aside>
+        </section>
+
+        <section class="workspace" id="workspace">
+          <div class="workspace-sidebar">
+            <article class="panel intake-card" data-reveal>
+              <div class="card-head">
+                <div>
+                  <p class="section-kicker">Dataset intake</p>
+                  <h2>Upload structured data with any column names.</h2>
+                </div>
+                <p class="card-chip">Browser powered</p>
+              </div>
+
+              <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload data file">
+                <div class="dropzone-icon">+</div>
+                <p class="dropzone-title">Drop a data file here or click to upload</p>
+                <p class="dropzone-copy">
+                  Supported: <code>csv</code>, <code>tsv</code>, <code>txt</code>,
+                  <code>json</code>, <code>jsonl</code>, <code>ndjson</code>,
+                  <code>psv</code>, <code>pdf</code>, <code>docx</code>, and common image files.
+                </p>
+                <p class="dropzone-copy">
+                  No fixed schema is required. If the file is machine-readable,
+                  the app profiles it directly. If it is a PDF, Word doc, or
+                  image, it extracts text first and then profiles the result.
+                </p>
+              </div>
+
+              <div class="uploader-actions">
+                <button class="button button-primary button-wide" id="uploadTrigger" type="button">
+                  Upload data
+                </button>
+                <button class="button button-ghost button-wide" id="loadSample" type="button">
+                  Load sample data
+                </button>
+                <input
+                  id="datasetFile"
+                  type="file"
+                  accept=".csv,.tsv,.txt,.json,.jsonl,.ndjson,.psv,.data,.pdf,.docx,.doc,.png,.jpg,.jpeg,.webp,.gif,.bmp,.tif,.tiff,text/csv,text/tab-separated-values,text/plain,application/json,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/*"
+                  hidden
+                />
+              </div>
+
+              <p class="file-name" id="fileName">Current dataset: sample-ops.json</p>
+              <p class="helper-text" id="uploadHint">
+                The sample file contains missing values, placeholders, inconsistent text, duplicate rows, and a suspicious outlier. PDFs, images, and Word documents are also supported through text extraction.
+              </p>
+
+              <div class="chip-row">
+                <span id="rawRowsChip">0 raw rows</span>
+                <span id="rawColumnsChip">0 columns</span>
+                <span id="formatChip">Format pending</span>
+              </div>
+            </article>
+
+            <article class="panel clean-card" data-reveal>
+              <div class="card-head">
+                <div>
+                  <p class="section-kicker">Cleaning consent</p>
+                  <h2>Do you want me to clean this data?</h2>
+                </div>
+                <p class="card-chip" id="cleanModeBadge">Original view</p>
+              </div>
+
+              <p class="helper-text" id="cleanPromptCopy">
+                Safe cleaning will trim whitespace, normalize blank markers, standardize low-cardinality categories, parse values into consistent types, and remove exact duplicates. It will not invent missing business values.
+              </p>
+
+              <div class="uploader-actions">
+                <button class="button button-primary button-wide" id="previewCleaning" type="button">
+                  Preview cleaned result
+                </button>
+                <button class="button button-ghost button-wide" id="applyCleaning" type="button">
+                  Apply cleaning in prototype
+                </button>
+                <button class="button button-ghost button-wide" id="revertOriginal" type="button">
+                  Return to original
+                </button>
+              </div>
+            </article>
+
+            <article class="panel preview-card" data-reveal>
+              <div class="card-head">
+                <div>
+                  <p class="section-kicker">Cleaning preview</p>
+                  <h2>What would change</h2>
+                </div>
+              </div>
+
+              <p class="helper-text" id="cleaningSummary">
+                Load a dataset to generate a cleaning plan.
+              </p>
+              <ul class="preview-list" id="cleaningActionList"></ul>
+              <p class="helper-text" id="cleaningDelta">Quality delta pending.</p>
+            </article>
+          </div>
+
+          <div class="workspace-main">
+            <section class="metrics-grid">
+              <article class="panel metric-card tone-blue" data-reveal>
+                <span class="mini-label">Rows profiled</span>
+                <p class="metric-value" id="metricRows">0</p>
+                <p class="metric-note">usable records in the current view</p>
+              </article>
+              <article class="panel metric-card tone-teal" data-reveal>
+                <span class="mini-label">Columns inferred</span>
+                <p class="metric-value" id="metricColumns">0</p>
+                <p class="metric-note">schema generated from the file</p>
+              </article>
+              <article class="panel metric-card tone-rose" data-reveal>
+                <span class="mini-label">Usable completeness</span>
+                <p class="metric-value" id="metricCompleteness">0%</p>
+                <p class="metric-note">excluding blanks and low-information placeholders</p>
+              </article>
+              <article class="panel metric-card tone-gold" data-reveal>
+                <span class="mini-label">Data health score</span>
+                <p class="metric-value" id="metricHealth">0%</p>
+                <p class="metric-note">based on missingness, duplicates, and validity</p>
+              </article>
+            </section>
+
+            <section class="story-strip">
+              <article class="panel story-chip" data-reveal>
+                <span class="mini-label">Format</span>
+                <strong id="statFormat">-</strong>
+                <p id="statFormatDetail">Waiting for analysis.</p>
+              </article>
+              <article class="panel story-chip" data-reveal>
+                <span class="mini-label">Duplicate rows</span>
+                <strong id="statDuplicates">-</strong>
+                <p id="statDuplicatesDetail">Waiting for analysis.</p>
+              </article>
+              <article class="panel story-chip" data-reveal>
+                <span class="mini-label">Missing cells</span>
+                <strong id="statMissing">-</strong>
+                <p id="statMissingDetail">Waiting for analysis.</p>
+              </article>
+              <article class="panel story-chip" data-reveal>
+                <span class="mini-label">Rows at risk</span>
+                <strong id="statProblemRows">-</strong>
+                <p id="statProblemRowsDetail">Waiting for analysis.</p>
+              </article>
+            </section>
+
+            <section class="insight-grid">
+              <article class="panel chart-card" data-reveal>
+                <div class="card-head">
+                  <div>
+                    <p class="section-kicker">Column health</p>
+                    <h2>Missingness by column</h2>
+                  </div>
+                  <p class="card-chip" id="columnHealthChip">Profile pending</p>
+                </div>
+
+                <div class="completeness-chart" id="completenessChart"></div>
+              </article>
+
+              <article class="panel narrative-card" data-reveal>
+                <div class="card-head">
+                  <div>
+                    <p class="section-kicker">Narrative summary</p>
+                    <h2 id="qualityHeadline">Waiting for analysis.</h2>
+                  </div>
+                  <p class="card-chip">Executive brief</p>
+                </div>
+
+                <p class="narrative-lead" id="qualityLead">
+                  Upload a file to generate a quality report.
+                </p>
+                <ul class="narrative-points" id="recommendationList"></ul>
+              </article>
+            </section>
+
+            <section class="analysis-grid">
+              <article class="panel issues-card" data-reveal>
+                <div class="card-head">
+                  <div>
+                    <p class="section-kicker">What is wrong with the data</p>
+                    <h2>Quality issues</h2>
+                  </div>
+                  <p class="card-chip" id="issueChip">0 issues</p>
+                </div>
+
+                <div class="issue-list" id="issueList"></div>
+
+                <div class="issue-actions">
+                  <button class="button button-primary" id="quickClean" type="button">
+                    Clean safe issues here
+                  </button>
+                  <button class="button button-ghost" id="downloadCleaned" type="button">
+                    Download cleaned JSON
+                  </button>
+                </div>
+
+                <p class="helper-text" id="issueActionHint">
+                  Review the issues, then clean the reversible fixes directly in the prototype.
+                </p>
+              </article>
+
+              <article class="panel problems-card" data-reveal>
+                <div class="card-head">
+                  <div>
+                    <p class="section-kicker">Records needing review</p>
+                    <h2>Problem rows</h2>
+                  </div>
+                  <p class="card-chip" id="problemRowChip">0 rows</p>
+                </div>
+
+                <div class="problem-row-list" id="problemRowList"></div>
+              </article>
+            </section>
+
+            <section class="panel schema-panel" data-reveal>
+              <div class="card-head">
+                <div>
+                  <p class="section-kicker">Schema inference</p>
+                  <h2>Column profile board</h2>
+                </div>
+                <p class="card-chip" id="schemaChip">0 columns</p>
+              </div>
+
+              <div class="column-grid" id="columnGrid"></div>
+            </section>
+
+            <section class="panel data-preview-panel" data-reveal>
+              <div class="card-head">
+                <div>
+                  <p class="section-kicker">Prototype output</p>
+                  <h2>Cleaned data preview</h2>
+                </div>
+                <p class="card-chip" id="dataPreviewChip">Original rows</p>
+              </div>
+
+              <p class="helper-text" id="dataPreviewSummary">
+                Load a file to inspect rows inside the prototype.
+              </p>
+
+              <div class="table-shell">
+                <table class="data-table">
+                  <thead id="dataTableHead"></thead>
+                  <tbody id="dataTableBody"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="panel engine-panel" id="engine" data-reveal>
+          <div class="card-head">
+            <div>
+              <p class="section-kicker">Technical edge</p>
+              <h2>Schema-agnostic quality analysis with a consent-first cleaning flow.</h2>
+            </div>
+          </div>
+
+          <div class="engine-cards">
+            <article class="engine-card">
+              <span class="mini-label">Flexible ingestion</span>
+              <h3>Parses varied data formats</h3>
+              <p>
+                The app accepts delimited text and JSON-style records, detects
+                structure, and profiles the dataset even when the field names are unfamiliar.
+              </p>
+            </article>
+            <article class="engine-card">
+              <span class="mini-label">Quality profiling</span>
+              <h3>Finds what is missing or inconsistent</h3>
+              <p>
+                Missing values, placeholder values, duplicates, invalid dates,
+                mixed types, and suspicious outliers are surfaced in plain language.
+              </p>
+            </article>
+            <article class="engine-card">
+              <span class="mini-label">Accuracy guidance</span>
+              <h3>Tells the user what to add</h3>
+              <p>
+                The recommendation layer explains which fields are weakening the data
+                and what information would improve trust and downstream accuracy.
+              </p>
+            </article>
+            <article class="engine-card">
+              <span class="mini-label">Safe cleaning</span>
+              <h3>Asks before changing anything</h3>
+              <p>
+                Cleaning is previewable, reversible, and conservative. The app
+                standardizes what is present, but it does not fabricate missing facts.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="timeline">
+          <article class="panel timeline-card" data-reveal>
+            <p class="section-kicker">Judge walkthrough</p>
+            <h2>How to demo it live.</h2>
+            <ol class="timeline-list">
+              <li>
+                <span>01</span>
+                Upload a messy file with arbitrary columns and show that the app still infers structure.
+              </li>
+              <li>
+                <span>02</span>
+                Walk through missingness, mixed types, duplicates, and the problem-row review list.
+              </li>
+              <li>
+                <span>03</span>
+                Use the cleaning prompt to preview or apply safe cleanup only after the user agrees.
+              </li>
+            </ol>
+          </article>
+
+          <article class="panel trust-card" id="trust" data-reveal>
+            <p class="section-kicker">Trust and clarity</p>
+            <h2>Nothing is hidden from the user.</h2>
+            <ul class="trust-list">
+              <li>The app explains what is missing, what is suspicious, and what is still unknown after cleaning.</li>
+              <li>Recommendations focus on improving accuracy instead of pretending the data is already good enough.</li>
+              <li>Cleaning only happens after the user explicitly previews or applies it.</li>
+              <li>The original view stays available so the user can compare before and after.</li>
+            </ul>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>

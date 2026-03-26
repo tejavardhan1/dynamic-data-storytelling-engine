@@ -1,0 +1,10 @@
+{
+  "name": "dynamic-data-storytelling-engine",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A zero-dependency showcase prototype for dynamic data storytelling.",
+  "scripts": {
+    "dev": "python3 -m http.server ${PORT:-4173}",
+    "start": "python3 -m http.server ${PORT:-4173}"
+  }
+}
